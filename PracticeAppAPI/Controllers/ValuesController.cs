@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PracticeAppAPI.Data;
 
 namespace PracticeAppAPI.Controllers
 {
@@ -10,18 +12,26 @@ namespace PracticeAppAPI.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        private readonly DataContext _context;
+        public ValuesController(DataContext context)
         {
-            return new string[] { "value1", "value2" };
+            _context = context;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        // GET api/values
+        [HttpGet]
+        public async Task<IActionResult> GetValues()
         {
-            return "value";
+            var results = await _context.Values.ToListAsync();
+            return Ok(results);
+        }
+
+        // GET api/values/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetValue(int id)
+        {
+            var result = await _context.Values.FirstOrDefaultAsync(x => x.Id == id);
+            return Ok(result);// the controller returns 204 status code automatically if the result is null
         }
 
         // POST api/values
