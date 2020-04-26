@@ -1,3 +1,6 @@
 PracticeAppAPI/obj/
 PracticeAppAPI/bin/
 .vscode/
+PracticeAppAPI/PracticeAppAPI.db-shm
+PracticeAppAPI/PracticeAppAPI.db-wal
+PracticeAppAPI/PracticeAppAPI.db
