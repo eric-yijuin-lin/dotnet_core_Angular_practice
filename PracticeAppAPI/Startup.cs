@@ -30,6 +30,15 @@ namespace PracticeAppAPI
             services.AddDbContext<DataContext>(x => x.UseSqlite(
                 Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
+            services.AddCors(option => 
+            {
+                option.AddPolicy("testPolicy", policy => 
+                {
+                    policy.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +52,8 @@ namespace PracticeAppAPI
             // app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("testPolicy");
 
             app.UseAuthorization();
 
