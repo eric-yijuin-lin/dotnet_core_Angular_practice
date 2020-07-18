@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PracticeAppAPI.Data;
+using CustomizedMiddleware;
 
 namespace PracticeAppAPI
 {
@@ -56,6 +57,8 @@ namespace PracticeAppAPI
             app.UseCors("testPolicy");
 
             app.UseAuthorization();
+
+            app.UseMiddleware<CultureQueryMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
