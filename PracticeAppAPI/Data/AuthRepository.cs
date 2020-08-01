@@ -2,6 +2,10 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PracticeAppAPI.Models;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 namespace PracticeAppAPI.Data
 {
@@ -47,6 +51,32 @@ namespace PracticeAppAPI.Data
                 return true;
 
             return false;
+        }
+
+        public string CreateJwtToken(string userId, string userName, string tokenKey)
+        {
+            var claims = new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.Name, userName)
+            };
+
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(tokenKey)
+            );
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var tokenDescriptor = new SecurityTokenDescriptor()
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddHours(1),
+                SigningCredentials = creds
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return tokenHandler.WriteToken(token);
         }
 
         #region private functions

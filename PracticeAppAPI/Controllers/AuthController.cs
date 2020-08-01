@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using PracticeAppAPI.Data;
 using PracticeAppAPI.Dtos;
 using PracticeAppAPI.Models;
@@ -15,10 +16,12 @@ namespace PracticeAppAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepo;
+        private readonly IConfiguration _config;
 
-        public AuthController(IAuthRepository authRepo)
+        public AuthController(IAuthRepository authRepo, IConfiguration config)
         {
             _authRepo = authRepo;
+            _config = config;
         }
 
         [HttpPost("register")]
@@ -43,6 +46,26 @@ namespace PracticeAppAPI.Controllers
             // 201 = created
             // should be replaced by CreatedAtRoute() later
             return StatusCode(201);
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
+        {
+            var userFromRepo = await _authRepo.Login(
+                userForLoginDto.Username.ToLower(),
+                userForLoginDto.Password);
+
+            if (userForLoginDto == null)
+                return Unauthorized();
+
+            string serverTokenKey = _config.GetSection("Auth:JwtTokenKey").Value;
+            string jwtToken = _authRepo.CreateJwtToken(
+                userFromRepo.Id.ToString(),
+                userFromRepo.UserName,
+                serverTokenKey
+            );
+
+            return Ok(new { token = jwtToken });
         }
     }
 }

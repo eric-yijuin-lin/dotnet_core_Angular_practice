@@ -11,4 +11,11 @@ namespace PracticeAppAPI.Dtos
         [StringLength(10, MinimumLength = 4, ErrorMessage = "password should between 4-10 charactors")]
         public string Password { get; set; }
     }
+
+    public class UserForLoginDto
+    {
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+    }
 }
