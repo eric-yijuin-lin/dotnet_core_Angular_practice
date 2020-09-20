@@ -13,6 +13,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PracticeAppAPI.Data;
 using CustomizedMiddleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace PracticeAppAPI
 {
@@ -42,6 +45,21 @@ namespace PracticeAppAPI
             });
 
             services.AddScoped<IAuthRepository, AuthRepository>();
+
+            //after add the package, remember to restore nuget package to enable "JwtBearerDefaults"
+            var tvp = new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = false,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(Configuration.GetSection("Auth:JwtTokenKey").Value)),
+            };
+            tvp.ValidateIssuer = false; // maybe different version, i cannot set this value in constructor, so i do it here
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(option =>
+                {
+                    option.TokenValidationParameters = tvp;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +76,7 @@ namespace PracticeAppAPI
 
             app.UseCors("testPolicy");
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseMiddleware<CultureQueryMiddleware>();

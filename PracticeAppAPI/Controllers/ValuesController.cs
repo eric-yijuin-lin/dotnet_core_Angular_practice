@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PracticeAppAPI.Data;
 
 namespace PracticeAppAPI.Controllers
 {
+    [Authorize] // this attribute will protect this controller by applying authrizing mechanism
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
@@ -27,6 +29,8 @@ namespace PracticeAppAPI.Controllers
         }
 
         // GET api/values/{id}
+        [AllowAnonymous] // the [Authorize] attribute is protecting every action of it, but with this attribute
+                         // this action becomes an special case that is allowed to invoke without authorized
         [HttpGet("{id}")]
         public async Task<IActionResult> GetValue(int id)
         {
